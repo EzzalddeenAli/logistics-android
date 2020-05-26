@@ -1,18 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.hypertrack.logistics.android.github">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="true" />
 
     <application
         android:name="com.hypertrack.android.utils.MyApplication"
@@ -22,69 +11,61 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity
+            android:name="com.hypertrack.android.ui.PermissionRequestActivity"
+            android:label="@string/title_activity_permission_request"></activity>
         <activity
             android:name="com.hypertrack.android.ui.SplashScreen"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
-
             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
 
-        </activity>
+            <!-- Branch URI Scheme -->
+            <intent-filter>
+                <data android:scheme="hypertrack-logistics" />
 
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <!-- Branch App Links (optional) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="hypertrack-logistics.app.link"
+                    android:scheme="https" />
+                <data
+                    android:host="hypertrack-logistics.app.link"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.hypertrack.android.ui.CheckInActivity"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
         <activity
-            android:name="com.hypertrack.android.ui.ListActivity"
-             android:windowSoftInputMode="stateAlwaysHidden" />
-
-        <activity android:name="com.hypertrack.android.ui.JobDetailActivity"
-            android:parentActivityName="com.hypertrack.android.ui.ListActivity"
-            />
-
-
-        <service
-            android:name="com.hypertrack.android.fcm.FirebaseService"
-            android:stopWithTask="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
+            android:name="com.hypertrack.android.ui.DeliveryListActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name="com.hypertrack.android.ui.DeliveryDetailActivity"
+            android:parentActivityName="com.hypertrack.android.ui.DeliveryListActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
-
-
-        <service
-            android:name="com.hypertrack.sdk.HyperTrackMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="@string/file_provider_authority"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
-
         <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/channel_id" />
+            android:name="io.branch.sdk.BranchKey"
+            android:value="@string/branch_io_api_key" />
     </application>
+
 </manifest>

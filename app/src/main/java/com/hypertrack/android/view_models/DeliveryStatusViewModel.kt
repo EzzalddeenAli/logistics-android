@@ -1,46 +1,46 @@
 package com.hypertrack.android.view_models
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import com.hypertrack.android.repository.CheckInRepo
-import com.hypertrack.android.repository.DeliveryStatusRepo
-import com.hypertrack.android.repository.SingleDriverRepo
-import com.hypertrack.android.response.CheckInResponse
-import com.hypertrack.android.response.Deliveries
-import com.hypertrack.android.response.SingleDriverResponse
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
+import com.hypertrack.android.repository.DeliveriesRepository
+import com.hypertrack.android.repository.Delivery
 
-class DeliveryStatusViewModel(application : Application) : AndroidViewModel(application) {
+class DeliveryStatusViewModel(
+    private val deliveriesRepository: DeliveriesRepository,
+    private val id: String
+) : ViewModel() {
 
-    var deliveryStatusRepo: DeliveryStatusRepo? = null
+    val delivery: LiveData<Delivery> = deliveriesRepository.deliveryForId(id)
+    private var deliveryNote = delivery.value?.deliveryNote?:""
 
-    var deliveryStatus: LiveData<Deliveries>? = null
+    private val _showNoteUpdatedToast = MutableLiveData(false)
 
-    private var changeMediator: MediatorLiveData<Deliveries>? = null
+    val showNoteUpdatedToast: LiveData<Boolean>
+        get() = _showNoteUpdatedToast
 
-    init {
 
-        deliveryStatusRepo = DeliveryStatusRepo(application)
-
-        changeMediator = MediatorLiveData()
-
-        singleDriverApiResponse()
+    fun onDeliveryNoteChanged(newNote : String) {
+        Log.d(TAG, "onDeliveryNoteChanged $newNote")
+        deliveryNote = newNote
     }
 
-    // call repo method for init API
-    fun callStatusMethod(driverId : String,type : String) {
+    fun onMarkedCompleted() = deliveriesRepository.markCompleted(id)
 
-        deliveryStatusRepo?.callChangeDeliveryStatus(driverId,type)
+    fun getLatLng(): LatLng = LatLng(
+        delivery.value?.latitude?:37.79337833161658,
+        delivery.value?.longitude?:-122.39470660686493
+    )
+
+    fun getLabel() : String = "Parcel ${delivery.value?._id?:"unknown"}"
+
+    fun onBackPressed() {
+        val noteChanged = deliveriesRepository.updateDeliveryNote(id, deliveryNote)
+        _showNoteUpdatedToast.postValue(noteChanged)
+
     }
 
-    // add response here for getting
-    private fun singleDriverApiResponse() {
-
-        deliveryStatus = deliveryStatusRepo?.getResponse()
-
-        changeMediator?.addSource(deliveryStatus!!) {
-            print("Check in repo")
-        }
-    }
+    companion object {const val TAG = "DeliveryStatusVM"}
 }
